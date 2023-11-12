@@ -1,0 +1,8 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: pod-app-ml
+spec:
+    containers:
+    - name: web-app
+      image: yuriihavrylko/prjctr:latest

@@ -1,0 +1,8 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: pod-job-ml
+spec:
+    containers:
+    - name: job-app
+      image: yuriihavrylko/job:latest

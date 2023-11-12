@@ -1,0 +1,12 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-app
+spec:
+  parallelism: 5
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - image: yuriihavrylko/prjctr:latest
+          name: job-app
