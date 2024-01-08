@@ -29,7 +29,7 @@ jobs:
 
       - name: 'Run pytest'
         run: |
-          cd app/src/
+          cd app/
           pytest tests/
 
   push-image:
