@@ -29,7 +29,7 @@ jobs:
 
       - name: 'Run pytest'
         run: |
-          cd src/
+          cd app/src/
           pytest tests/
 
       - name: 'Login to Docker Hub'
