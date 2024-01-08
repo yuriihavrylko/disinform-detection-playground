@@ -1,0 +1,3 @@
+ipykernel==6.28.0
+wandb==0.16.1
+evaluate==0.4.1
