@@ -22,3 +22,11 @@ DH Images:
 Works on push to master/feature*
 ![Alt text](assets/actions.png)
 
+### Streamlit 
+
+Run:
+```
+streamlit run src/serving/streamlit.py
+```
+
+![Alt text](assets/streamlit.png)
