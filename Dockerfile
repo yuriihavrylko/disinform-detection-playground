@@ -23,7 +23,7 @@ EXPOSE 5000
 EXPOSE 9000
 ENV MODEL_NAME SeldonAPI
 ENV SERVICE_TYPE MODEL
-COPY src/serving/seldon.py /app/SeldonAPI.py
+COPY app/src/serving/seldon.py /app/SeldonAPI.py
 
 RUN chown -R 8888 /app
 RUN mkdir /.cache
