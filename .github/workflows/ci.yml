@@ -31,6 +31,8 @@ jobs:
         run: |
           cd app/
           pytest tests/
+        env:
+          PYTHONPATH: '.'
 
   push-image:
     needs: tests
