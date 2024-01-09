@@ -68,3 +68,12 @@ Deploy k8s:
 ```
 kubectl create -f deployment/seldon-custom.yaml
 ```
+
+### Kserve
+
+Deploy k8s:
+
+```
+kubectl create -f deployment/kserve.yaml
+kubectl get inferenceservice custom-model
+```
