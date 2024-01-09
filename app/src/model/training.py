@@ -93,23 +93,49 @@ def finish_wandb():
     """Finish the Weights & Biases run."""
     wandb.finish()
 
+def load_and_preprocess_data(train_size=TRAIN_SIZE, eval_size=EVAL_SIZE):
+    datasets = load_data()
+    small_train_dataset = datasets["train"].shuffle(seed=SEED).select(range(train_size + eval_size))
+    return small_train_dataset
+
+def prepare_model_and_tokenizer():
+    model = BertForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=2)
+    tokenizer = BertTokenizer.from_pretrained(MODEL_NAME)
+    return model, tokenizer
+
+def tokenize_datasets(tokenizer, small_train_dataset):
+    tokenized_datasets = tokenize_data(tokenizer, small_train_dataset)
+    tokenized_datasets = tokenized_datasets.remove_columns(["text"])
+    return tokenized_datasets
+
+def split_datasets(tokenized_datasets, args):
+    return prepare_datasets(tokenized_datasets, args)
+
+def perform_training(model, tokenizer, train_dataset, eval_dataset):
+    return train_model(model, tokenizer, train_dataset, eval_dataset)
+
+def save_and_log_artifacts(trainer, tokenizer):
+    artifact_path = save_model_and_tokenizer(trainer, tokenizer)
+    log_to_wandb(DATASET_NAME, artifact_path)
+
+
+# The main function now orchestrates the calls to the decoupled parts
 def main():
     args = parse_args()
     initialize_wandb(args)
 
-    datasets = load_data()
-    small_train_dataset = datasets["train"].shuffle(seed=SEED).select(range(args.train_size + args.eval_size))
-    model = BertForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=2)
-    tokenizer = BertTokenizer.from_pretrained(MODEL_NAME)
+    small_train_dataset = load_and_preprocess_data(args.train_size, args.eval_size)
 
-    tokenized_datasets = tokenize_data(tokenizer, small_train_dataset)
-    tokenized_datasets = tokenized_datasets.remove_columns(["text"])
+    model, tokenizer = prepare_model_and_tokenizer()
 
-    train_dataset, eval_dataset = prepare_datasets(tokenized_datasets, args)
-    trainer = train_model(model, tokenizer, train_dataset, eval_dataset)
+    tokenized_datasets = tokenize_datasets(tokenizer, small_train_dataset)
+    
+    train_dataset, eval_dataset = split_datasets(tokenized_datasets, args)
 
-    artifact_path = save_model_and_tokenizer(trainer, tokenizer)
-    log_to_wandb(DATASET_NAME, artifact_path)
+    trainer = perform_training(model, tokenizer, train_dataset, eval_dataset)
+
+    save_and_log_artifacts(trainer, tokenizer)
+
     finish_wandb()
 
 if __name__ == "__main__":
