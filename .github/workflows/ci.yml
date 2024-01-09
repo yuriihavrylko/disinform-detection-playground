@@ -11,7 +11,29 @@ on:
   workflow_dispatch:
 
 jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@main
+      
+      - name: 'Set up Python'
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: 'Install dependencies'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r app/requirements-dev.txt
+
+      - name: 'Run pytest'
+        run: |
+          cd app/
+          pytest tests/
+
   push-image:
+    needs: tests
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout GitHub Action'
