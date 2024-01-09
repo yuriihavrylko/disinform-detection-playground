@@ -1,15 +1,32 @@
 apiVersion: machinelearning.seldon.io/v1
 kind: SeldonDeployment
 metadata:
-  name: iris-model
+  name: nlp-sample
   namespace: default
 spec:
-  name: iris
+  annotations:
+    seldon.io/rest-timeout: "60"
+    seldon.io/grpc-timeout: "60"
+  protocol: seldon
   predictors:
-  - graph:
-      implementation: SKLEARN_SERVER
-      modelUri: gs://seldon-models/v1.15.0-dev/sklearn/iris
+  - componentSpecs:
+    - spec:
+        containers:
+        - image: yuriihavrylko/app-seldon:latest
+          name: classifier
+          env:
+          - name: GUNICORN_THREADS
+            value: '1'
+          - name: GUNICORN_WORKERS
+            value: '1'
+          - name: FLASK_SINGLE_THREADED
+            value: '1'
+          - name: SELDON_DEBUG
+            value: '1'                 
+          imagePullPolicy: Always
+
+    graph:
       name: classifier
-    name: default
+      type: MODEL
+    name: model
     replicas: 1
-  
