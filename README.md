@@ -98,5 +98,5 @@ kubectl patch -n kube-system deployment metrics-server --type=json -p '[{"op":"a
 Run from config
 
 ```
-kubectl create -f deployment/fastapi-hpa.yaml
+kubectl create -f deployment/app-fastapi-scaling.yml
 ```
