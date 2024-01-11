@@ -72,7 +72,7 @@ def train_student_model(student, teacher, train_dataset, eval_dataset, tokenizer
     trainer.train()
     return trainer.evaluate()
 
-if __name__ == "__main__":
+def main():
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
     train_set = load_and_tokenize_data(tokenizer, "train[:10000]")
     valid_set = load_and_tokenize_data(tokenizer, "validation[:2000]")
@@ -104,3 +104,5 @@ if __name__ == "__main__":
     tokenizer.save_pretrained(distil_model_path)
     publish_model(distil_model_path, PROJECT, "bert_fake_news_distil")
 
+if __name__ == "__main__":
+    main()
