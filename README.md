@@ -115,3 +115,42 @@ Run distilation:
 ```
 python -m src.model.distilation
 ```
+
+### Kafka
+
+Install kafka
+```
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install zookeeper bitnami/zookeeper --set replicaCount=1 --set auth.enabled=false --set allowAnonymousLogin=true --set persistance.enabled=false --version 11.0.0
+helm install kafka bitnami/kafka --set zookeeper.enabled=false --set replicaCount=1 --set persistance.enabled=false
+
+
+# eventing
+kubectl apply -f https://github.com/knative/eventing/releases/download/knative-v1.9.7/eventing-crds.yaml
+kubectl apply -f https://github.com/knative/eventing/releases/download/knative-v1.9.7/eventing-core.yaml
+kubectl apply -f https://github.com/knative-sandbox/eventing-kafka/releases/download/knative-v1.9.1/source.yaml
+```
+
+Run deployment
+
+```
+kubectl apply -f deployment/kafka-infra.yml
+
+kubectl port-forward $(kubectl get pod --selector="app=minio" --output jsonpath='{.items[0].metadata.name}') 9000:9000
+
+mc config host add myminio http://127.0.0.1:9000 miniominio miniominio
+
+mc mb myminio/input
+mc mb myminio/output
+
+mc admin config set myminio notify_kafka:1 tls_skip_verify="off"  queue_dir="" queue_limit="0" sasl="off" sasl_password="" sasl_username="" tls_client_auth="0" tls="off" client_tls_cert="" client_tls_key="" brokers="kafka-headless.default.svc.cluster.local:9092" topic="test" version=""
+
+
+mc admin service restart myminio
+mc event add myminio/input arn:minio:sqs::1:kafka -p --event put --suffix .json
+
+kubectl create -f deployment/kafka-infra.yml
+
+
+```
+
