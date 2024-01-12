@@ -10,3 +10,5 @@ wandb==0.16.1
 httpx==0.23.0
 locust==2.20.1
 textpruner==1.1.post2
+evidently==0.4.13
+sentence_transformers==2.2.2
