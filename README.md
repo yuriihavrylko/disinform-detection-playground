@@ -154,3 +154,10 @@ kubectl create -f deployment/kafka-infra.yml
 
 ```
 
+### Data drift detetion
+
+```
+python -m src.monitoring.drift
+```
+
+![Alt text](assets/drift.png)
