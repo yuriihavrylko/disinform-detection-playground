@@ -63,4 +63,40 @@ Upload data
 export AWS_ACCESS_KEY_ID='...'
 export AWS_SECRET_ACCESS_KEY='...'
 dvc push
+
+
+### Label studio
+
+```
+docker pull heartexlabs/label-studio:latest
+docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest
+```
+
+![Alt text](assets/labeling.png)
+
+
+### Minio setup
+Mac/Local
+```
+brew install minio/stable/minio
+
+minio server --console-address :9001 ~/minio # path to persistent local storage + run on custom port
+```
+
+Docker
+
+```
+docker run \
+   -p 9002:9002 \
+   --name minio \
+   -v ~/minio:/data \
+   -e "MINIO_ROOT_USER=ROOTNAME" \
+   -e "MINIO_ROOT_PASSWORD=CHANGEME123" \
+   quay.io/minio/minio server /data --console-address ":9002"
+```
+
+Kubernetes
+
+```
+kubectl create -f deployment/minio.yml
 ```
