@@ -32,3 +32,4 @@ RUN mkdir /.config
 RUN chmod 777 /.config
 
 CMD exec seldon-core-microservice $MODEL_NAME --service-type $SERVICE_TYPE
+
