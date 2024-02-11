@@ -30,3 +30,10 @@ streamlit run src/serving/streamlit.py
 ```
 
 ![Alt text](assets/streamlit.png)
+
+
+### Fast API 
+
+Postman
+
+![Alt text](assets/fastapi.png)
