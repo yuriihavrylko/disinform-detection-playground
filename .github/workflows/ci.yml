@@ -2,6 +2,8 @@ name: Deploy Image to Docker Hub
 
 env:
   APP_NAME: 'prjctr'
+  STREAMLIT_NAME: 'app-streamlit'
+  FASTAPI_NAME: 'app-fastapi'
 
 on:
   push:
@@ -52,3 +54,12 @@ jobs:
         run: |
           docker build . --tag docker.io/${{ secrets.DH_USERNAME }}/$APP_NAME:latest
           docker push docker.io/${{ secrets.DH_USERNAME }}/$APP_NAME:latest
+      - name: 'Build & Push Image streamlit'
+        run: |
+          docker build . --tag docker.io/${{ secrets.DH_USERNAME }}/$STREAMLIT_NAME:latest
+          docker push docker.io/${{ secrets.DH_USERNAME }}/$STREAMLIT_NAME:latest
+      - name: 'Build & Push Image fastapi'
+        run: |
+          docker build . --tag docker.io/${{ secrets.DH_USERNAME }}/$FASTAPI_NAME:latest
+          docker push docker.io/${{ secrets.DH_USERNAME }}/$FASTAPI_NAME:latest
+

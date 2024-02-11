@@ -33,11 +33,26 @@ streamlit run src/serving/streamlit.py
 ![Alt text](assets/streamlit.png)
 
 
+Deploy k8s:
+```
+kubectl create -f deployment/app-ui.yml
+kubectl port-forward --address 0.0.0.0 svc/app-ui.yml 8080:8080
+```
+
+
 ### Fast API 
 
 Postman
 
 ![Alt text](assets/fastapi.png)
+
+
+
+Deploy k8s:
+```
+kubectl create -f deployment/app-fasttext.yml
+kubectl port-forward --address 0.0.0.0 svc/app-fasttext 8090:8090
+```
 
 ### DVC
 
@@ -117,4 +132,5 @@ Kubernetes
 ```
 kubectl create -f deployment/minio.yml
 ```
+
 
