@@ -48,3 +48,10 @@ Kubernetes
 ```
 kubectl create -f deployment/minio.yml
 ```
+
+### Tests
+
+Run tests
+```
+pytest app/tests/
+```
