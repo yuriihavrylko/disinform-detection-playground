@@ -32,6 +32,11 @@ streamlit run src/serving/streamlit.py
 
 ![Alt text](assets/streamlit.png)
 
+Deploy k8s:
+```
+kubectl create -f deployment/app-ui.yml
+kubectl port-forward --address 0.0.0.0 svc/app-ui.yml 8080:8080
+```
 
 Deploy k8s:
 ```
@@ -54,6 +59,26 @@ kubectl create -f deployment/app-fasttext.yml
 kubectl port-forward --address 0.0.0.0 svc/app-fasttext 8090:8090
 ```
 
+
+### Seldon
+
+Instalation
+
+```
+kubectl apply -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-crds.yaml
+kubectl apply -n ambassador -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-kind.yaml
+kubectl wait --timeout=180s -n ambassador --for=condition=deployed ambassadorinstallations/ambassador
+
+kubectl create namespace seldon-system
+
+helm install seldon-core seldon-core-operator --version 1.15.1 --repo https://storage.googleapis.com/seldon-charts --set usageMetrics.enabled=true --set ambassador.enabled=true  --namespace seldon-system
+```
+
+Deploy k8s:
+```
+kubectl create -f deployment/seldon-custom.yaml
+```
+=======
 ### DVC
 
 Install DVC
@@ -132,5 +157,6 @@ Kubernetes
 ```
 kubectl create -f deployment/minio.yml
 ```
+
 
 
