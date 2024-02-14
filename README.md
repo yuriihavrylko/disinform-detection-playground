@@ -87,6 +87,14 @@ kubectl create -f deployment/kserve.yaml
 kubectl get inferenceservice custom-model
 ```
 
+
+### Load testing
+
+![Alt text](assets/locust.png)
+
+```
+locust -f benchmarks/load_test.py --host=http://localhost:9933 --users 50 --spawn-rate 10 --autostart --run-time 600s
+
 ### DVC
 
 Install DVC
