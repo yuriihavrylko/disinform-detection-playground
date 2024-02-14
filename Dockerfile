@@ -1,4 +1,4 @@
-FROM python:3.12-slim as builder
+FROM python:3.11-slim as builder
 
 WORKDIR /app
 
@@ -33,3 +33,6 @@ RUN chmod 777 /.config
 
 CMD exec seldon-core-microservice $MODEL_NAME --service-type $SERVICE_TYPE
 
+
+FROM builder AS app-kserve
+ENTRYPOINT ["python", "app/src/serving/kserve.py"]

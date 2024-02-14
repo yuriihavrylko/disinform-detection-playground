@@ -59,7 +59,6 @@ kubectl create -f deployment/app-fasttext.yml
 kubectl port-forward --address 0.0.0.0 svc/app-fasttext 8090:8090
 ```
 
-
 ### Seldon
 
 Instalation
@@ -78,7 +77,16 @@ Deploy k8s:
 ```
 kubectl create -f deployment/seldon-custom.yaml
 ```
-=======
+
+### Kserve
+
+Deploy k8s:
+
+```
+kubectl create -f deployment/kserve.yaml
+kubectl get inferenceservice custom-model
+```
+
 ### DVC
 
 Install DVC
@@ -157,6 +165,3 @@ Kubernetes
 ```
 kubectl create -f deployment/minio.yml
 ```
-
-
-

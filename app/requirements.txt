@@ -2,5 +2,7 @@ flask==3.0.0
 gunicorn==21.2.0
 transformers==4.36.2
 streamlit==1.29.0
-fastapi==0.108.0
-uvicorn==0.25.0
+fastapi==0.95.0
+uvicorn==0.19.0
+kserve==0.11.2
+protobuf==3.20.1
