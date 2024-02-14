@@ -188,3 +188,18 @@ Run from config
 ```
 kubectl create -f deployment/app-fastapi-scaling.yml
 ```
+
+
+### Model optimization
+
+Run pruning:
+
+```
+python -m src.model.pruning
+```
+
+Run distilation:
+
+```
+python -m src.model.distilation
+```
