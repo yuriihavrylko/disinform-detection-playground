@@ -33,5 +33,6 @@ RUN chmod 777 /.config
 
 CMD exec seldon-core-microservice $MODEL_NAME --service-type $SERVICE_TYPE
 
+
 FROM builder AS app-kserve
 ENTRYPOINT ["python", "app/src/serving/kserve.py"]
