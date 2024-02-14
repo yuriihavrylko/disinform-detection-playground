@@ -173,3 +173,18 @@ Kubernetes
 ```
 kubectl create -f deployment/minio.yml
 ```
+
+### POD autoscaling
+
+Install metric service
+
+```
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl patch -n kube-system deployment metrics-server --type=json -p '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+```
+
+Run from config
+
+```
+kubectl create -f deployment/app-fastapi-scaling.yml
+```
