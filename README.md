@@ -241,4 +241,3 @@ kubectl create -f deployment/kafka-infra.yml
 
 
 ```
-
