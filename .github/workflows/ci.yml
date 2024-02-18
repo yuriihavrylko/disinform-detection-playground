@@ -2,6 +2,8 @@ name: Deploy Image to Docker Hub
 
 env:
   APP_NAME: 'prjctr'
+  STREAMLIT_NAME: 'app-streamlit'
+  FASTAPI_NAME: 'app-fastapi'
 
 on:
   push:
@@ -11,7 +13,31 @@ on:
   workflow_dispatch:
 
 jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@main
+      
+      - name: 'Set up Python'
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: 'Install dependencies'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r app/requirements-dev.txt
+
+      - name: 'Run pytest'
+        run: |
+          cd app/
+          pytest tests/
+        env:
+          PYTHONPATH: '.'
+
   push-image:
+    needs: tests
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout GitHub Action'
@@ -28,3 +54,12 @@ jobs:
         run: |
           docker build . --tag docker.io/${{ secrets.DH_USERNAME }}/$APP_NAME:latest
           docker push docker.io/${{ secrets.DH_USERNAME }}/$APP_NAME:latest
+      - name: 'Build & Push Image streamlit'
+        run: |
+          docker build . --tag docker.io/${{ secrets.DH_USERNAME }}/$STREAMLIT_NAME:latest
+          docker push docker.io/${{ secrets.DH_USERNAME }}/$STREAMLIT_NAME:latest
+      - name: 'Build & Push Image fastapi'
+        run: |
+          docker build . --tag docker.io/${{ secrets.DH_USERNAME }}/$FASTAPI_NAME:latest
+          docker push docker.io/${{ secrets.DH_USERNAME }}/$FASTAPI_NAME:latest
+

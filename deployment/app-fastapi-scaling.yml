@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-fastapi
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app-fastapi
+  template:
+    metadata:
+      labels:
+        app: app-fastapi
+    spec:
+      containers:
+        - name: app-fastapi
+          image: yuriihavrylko/app-fastapi:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-fastapi
+  labels:
+    app: app-fastapi
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+  selector:
+    app: app-fastapi
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: app-fastapi
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: app-fastapi
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
