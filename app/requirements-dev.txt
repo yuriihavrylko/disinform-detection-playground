@@ -1,5 +1,8 @@
 -r requirements.txt
-
+pytest==7.4.4
+pytest-mock==3.12.0
+datasets==2.16.1
+pandas==2.0.3
 evaluate==0.4.1
 great-expectations==0.18.7
 pytest==7.4.4
@@ -13,3 +16,4 @@ textpruner==1.1.post2
 evidently==0.4.13
 sentence_transformers==2.2.2
 ipykernel==6.28.0
+
