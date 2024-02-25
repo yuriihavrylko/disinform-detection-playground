@@ -1,2 +1,12 @@
-FROM python:3.12-slim
-CMD python -c "import time; time.sleep(10); print(f'F1 = {0.95}')"
+FROM python:3.8-slim
+
+WORKDIR /app
+ADD . /app
+ENV PYTHONUNBUFFERED 1
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --upgrade pip && \
+    pip install -r app/requirements-dev.txt
+
+# Run the command to start the model training
+CMD ["python", "app/model/training.py"]
