@@ -1,99 +1,65 @@
-## Projector course work
-Skeleton for project on projector course
+## Projector Course Work: Disinformation Detection Service
+A project aimed at disinformation detection. This repository outlines the steps involved in deploying the service using various technologies, testing and benchmarking, as well as implementing various machine learning methodologies.
 
-### Docker 
+Done during Projector course [Machine Learning in Production](https://prjctr.com/course/machine-learning-in-production)
 
-Build
+## Table of Contents
+- [Projector Course Work: Disinformation Detection Service](#projector-course-work-disinformation-detection-service)
+- [Table of Contents](#table-of-contents)
+- [Prerequisites](#prerequisites)
+- [Minio setup](#minio-setup)
+- [Data](#data)
+  - [DVC](#dvc)
+  - [Label studio](#label-studio)
+- [Model training](#model-training)
+- [Model optimization](#model-optimization)
+- [Streamlit](#streamlit)
+- [Model serving](#model-serving)
+  - [Fast API](#fast-api)
+  - [Seldon](#seldon)
+  - [Kserve](#kserve)
+- [Tests](#tests)
+- [Benchmarks](#benchmarks)
+  - [File formats](#file-formats)
+  - [Load testing](#load-testing)
+- [POD autoscaling](#pod-autoscaling)
+- [Kafka](#kafka)
+- [Data drift detection](#data-drift-detection)
+
+
+## Prerequisites
+This guide assumes that you have basic knowledge in the following technologies:
+- Docker
+- GitHub Actions
+- Kubernetes
+
+## Minio setup
+Mac/Local
 ```
-docker build --tag yuriihavrylko/prjctr:latest .
-```
+brew install minio/stable/minio
 
-Push
-Build
-```
-docker push yuriihavrylko/prjctr:latest
-```
-
-DH Images:
-![Alt text](assets/images.png)
-
-### GH Actions:
-
-Works on push to master/feature*
-![Alt text](assets/actions.png)
-
-
-### Streamlit 
-
-Run:
-```
-streamlit run src/serving/streamlit.py
-```
-
-![Alt text](assets/streamlit.png)
-
-Deploy k8s:
-```
-kubectl create -f deployment/app-ui.yml
-kubectl port-forward --address 0.0.0.0 svc/app-ui.yml 8080:8080
-```
-
-Deploy k8s:
-```
-kubectl create -f deployment/app-ui.yml
-kubectl port-forward --address 0.0.0.0 svc/app-ui.yml 8080:8080
+minio server --console-address :9001 ~/minio # path to persistent local storage + run on custom port
 ```
 
-
-### Fast API 
-
-Postman
-
-![Alt text](assets/fastapi.png)
-
-
-
-Deploy k8s:
-```
-kubectl create -f deployment/app-fasttext.yml
-kubectl port-forward --address 0.0.0.0 svc/app-fasttext 8090:8090
-```
-
-### Seldon
-
-Instalation
+Docker
 
 ```
-kubectl apply -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-crds.yaml
-kubectl apply -n ambassador -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-kind.yaml
-kubectl wait --timeout=180s -n ambassador --for=condition=deployed ambassadorinstallations/ambassador
-
-kubectl create namespace seldon-system
-
-helm install seldon-core seldon-core-operator --version 1.15.1 --repo https://storage.googleapis.com/seldon-charts --set usageMetrics.enabled=true --set ambassador.enabled=true  --namespace seldon-system
+docker run \
+   -p 9002:9002 \
+   --name minio \
+   -v ~/minio:/data \
+   -e "MINIO_ROOT_USER=ROOTNAME" \
+   -e "MINIO_ROOT_PASSWORD=CHANGEME123" \
+   quay.io/minio/minio server /data --console-address ":9002"
 ```
 
-Deploy k8s:
-```
-kubectl create -f deployment/seldon-custom.yaml
-```
-
-### Kserve
-
-Deploy k8s:
+Kubernetes
 
 ```
-kubectl create -f deployment/kserve.yaml
-kubectl get inferenceservice custom-model
+kubectl create -f deployment/minio.yml
 ```
 
-
-### Load testing
-
-![Alt text](assets/locust.png)
-
-```
-locust -f benchmarks/load_test.py --host=http://localhost:9933 --users 50 --spawn-rate 10 --autostart --run-time 600s
+## Data
 
 ### DVC
 
@@ -136,7 +102,7 @@ Upload data
 export AWS_ACCESS_KEY_ID='...'
 export AWS_SECRET_ACCESS_KEY='...'
 dvc push
-
+```
 
 ### Label studio
 
@@ -148,42 +114,110 @@ docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label
 ![Alt text](assets/labeling.png)
 
 
-### Minio setup
-Mac/Local
-```
-brew install minio/stable/minio
 
-minio server --console-address :9001 ~/minio # path to persistent local storage + run on custom port
-```
+## Model training 
 
-Docker
-
+Build
 ```
-docker run \
-   -p 9002:9002 \
-   --name minio \
-   -v ~/minio:/data \
-   -e "MINIO_ROOT_USER=ROOTNAME" \
-   -e "MINIO_ROOT_PASSWORD=CHANGEME123" \
-   quay.io/minio/minio server /data --console-address ":9002"
+docker build -t model-training . -f job/Dockerfile
 ```
 
-Kubernetes
+Run
+```
+docker run -it model-training
+```
+
+## Model optimization
+
+Run pruning:
 
 ```
-kubectl create -f deployment/minio.yml
+python -m src.model.pruning
 ```
 
-### Tests
+Run distillation:
+
+```
+python -m src.model.distilation
+```
+
+
+## Streamlit 
+
+Run:
+```
+streamlit run src/serving/streamlit.py
+```
+
+![Alt text](assets/streamlit.png)
+
+Deploy k8s:
+```
+kubectl create -f deployment/app-ui.yml
+kubectl port-forward --address 0.0.0.0 svc/app-ui.yml 8080:8080
+```
+
+Deploy k8s:
+```
+kubectl create -f deployment/app-ui.yml
+kubectl port-forward --address 0.0.0.0 svc/app-ui.yml 8080:8080
+```
+
+## Model serving
+
+### Fast API 
+
+Postman
+
+![Alt text](assets/fastapi.png)
+
+
+
+Deploy k8s:
+```
+kubectl create -f deployment/app-fasttext.yml
+kubectl port-forward --address 0.0.0.0 svc/app-fasttext 8090:8090
+```
+
+### Seldon
+
+Installation
+
+```
+kubectl apply -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-crds.yaml
+kubectl apply -n ambassador -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-kind.yaml
+kubectl wait --timeout=180s -n ambassador --for=condition=deployed ambassadorinstallations/ambassador
+
+kubectl create namespace seldon-system
+
+helm install seldon-core seldon-core-operator --version 1.15.1 --repo https://storage.googleapis.com/seldon-charts --set usageMetrics.enabled=true --set ambassador.enabled=true  --namespace seldon-system
+```
+
+Deploy k8s:
+```
+kubectl create -f deployment/seldon-custom.yaml
+```
+
+### Kserve
+
+Deploy k8s:
+
+```
+kubectl create -f deployment/kserve.yaml
+kubectl get inferenceservice custom-model
+```
+
+
+## Tests
 
 Run tests
 ```
 pytest app/tests/
 ```
 
-### Benchmarks
+## Benchmarks
 
-Fileformats
+### File formats
 
 ![Alt text](assets/format_benchmark.png)
 
@@ -203,8 +237,17 @@ JSON format demonstrates faster write times but slower read times compared to ot
 PARQUET format showcases the fastest write times and relatively fast read times, with a smaller file size after write compared to CSV and JSON.
 
 ORC format exhibits moderate write times and the smallest file size after write among the tested formats, with efficient read times.
-=======
-### POD autoscaling
+
+
+### Load testing
+
+![Alt text](assets/locust.png)
+
+```
+locust -f benchmarks/load_test.py --host=http://localhost:9933 --users 50 --spawn-rate 10 --autostart --run-time 600s
+```
+
+## POD autoscaling
 
 Install metric service
 
@@ -220,21 +263,7 @@ kubectl create -f deployment/app-fastapi-scaling.yml
 ```
 
 
-### Model optimization
-
-Run pruning:
-
-```
-python -m src.model.pruning
-```
-
-Run distilation:
-
-```
-python -m src.model.distilation
-```
-
-### Kafka
+## Kafka
 
 Install kafka
 ```
@@ -268,11 +297,9 @@ mc admin service restart myminio
 mc event add myminio/input arn:minio:sqs::1:kafka -p --event put --suffix .json
 
 kubectl create -f deployment/kafka-infra.yml
-
-
 ```
 
-### Data drift detetion
+## Data drift detection
 
 ```
 python -m src.monitoring.drift
